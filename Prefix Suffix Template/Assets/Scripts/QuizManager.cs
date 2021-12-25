@@ -19,6 +19,12 @@ public class QuizManager : MonoBehaviour
     int totalQuestions = 0;
     public int score;
 
+    IEnumerator WaitForNext()
+    {
+        yield return new WaitForSeconds(1);
+        generateQuestion();
+    }
+
     private void Start()
     {
         totalQuestions = QnA.Count;
@@ -37,19 +43,19 @@ public class QuizManager : MonoBehaviour
         GoPanel.SetActive(true);
         ScoreTxt.text = score + "/" + totalQuestions;
     }
-    public void correct()
+    public void Correct()
     {
-        //when you answer correct
         score += 1;
         QnA.RemoveAt(CurrentQuestion);
-        generateQuestion();
+        StartCoroutine(WaitForNext());
+
     }
 
-    public void wrong()
+    public void Wrong()
     {
-        //when you answer wrong
         QnA.RemoveAt(CurrentQuestion);
-        generateQuestion();
+        StartCoroutine(WaitForNext());
+
     }
 
     void setAnswers()
@@ -58,8 +64,9 @@ public class QuizManager : MonoBehaviour
         {
             options[i].GetComponent<AnswerScript>().isCorrect = false;
             options[i].transform.GetChild(0).GetComponent<Text>().text = QnA[CurrentQuestion].Answers[i];
+            options[i].GetComponent<Image>().color = options[i].GetComponent<AnswerScript>().startColor;
 
-            if(QnA[CurrentQuestion].CorrectAnswer == i + 1)
+            if (QnA[CurrentQuestion].CorrectAnswer == i + 1)
             {
                 options[i].GetComponent<AnswerScript>().isCorrect = true;
             }
